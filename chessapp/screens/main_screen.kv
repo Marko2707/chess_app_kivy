@@ -1,0 +1,10 @@
+<MainScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        Button:
+            text: "Welcome to Kivy Reloader!!!"
+        Button:
+            text: "Camera"
+            on_press:
+                print("Camera Button pressed")
+                root.manager.current = "camera_screen"

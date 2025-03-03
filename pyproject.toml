@@ -1,0 +1,19 @@
+[project]
+name = "chessapp"
+version = "0.1.0"
+description = "A chessboard photo to FEN digitizer"
+authors = [
+    {name = "stud@goethe"}
+]
+readme = "README.md"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "kivy-reloader (>=0.4.6,<0.5.0)",
+    "opencv-python (>=4.11.0.86,<5.0.0.0)",
+    "plyer (>=2.1.0,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
