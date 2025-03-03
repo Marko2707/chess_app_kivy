@@ -1,0 +1,26 @@
+<Cv2PreProcessedScreen>:
+    orientation: 'vertical'
+    size: root.width, root.height
+
+    GridLayout:
+        rows: 2
+
+        RelativeLayout:
+            size_hint: 1, 0.8
+
+            BoxLayout:
+                id: cv2_display
+                canvas:
+                    Rectangle:
+                        id: cv2_texture
+                        size: self.size
+                        pos: self.pos
+        Button:
+            text: 'back'
+            size_hint: 1, None
+            height: root.height * 0.1
+            pos_hint: {'x': 0, 'y': 0}
+            on_release:
+                print("back")
+                root.manager.current = "camera_screen"
+                # root.test_opencv()

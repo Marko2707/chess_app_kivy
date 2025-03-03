@@ -1,0 +1,36 @@
+<CameraScreen>:
+    orientation: 'vertical'
+    size: root.width, root.height
+
+    GridLayout:
+        rows: 2
+
+        RelativeLayout:
+            size_hint: 1, 0.8
+
+            AndroidCamera:
+                index: 0
+                id: a_cam
+                resolution: self.camera_resolution
+                allow_stretch: True
+                play: True
+                canvas.before:
+                    PushMatrix
+                    Rotate:
+                        angle: -90
+                        origin: self.center
+                    Scale:
+                        x: self.cam_ratio
+                        y: self.cam_ratio
+                        origin: self.center
+                canvas.after:
+                    PopMatrix
+        Button:
+            text: 'opencv'
+            size_hint: 1, None
+            height: root.height * 0.1
+            pos_hint: {'x': 0, 'y': 0}
+            on_release: 
+                print("opencv")
+                root.manager.current = "cv2preprocessed_screen"
+                #root.test_opencv()
