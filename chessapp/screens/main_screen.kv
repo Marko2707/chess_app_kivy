@@ -1,10 +1,48 @@
 <MainScreen>:
     BoxLayout:
         orientation: "vertical"
+        padding: 20
+        spacing: 10
+        canvas.before:
+            Color:
+                rgba: 0.2, 0.2, 0.2, 1  # Dunkler Hintergrund
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        Image:
+            source: "assets/king.png"
+            size_hint: None, None
+            size: 500, 500
+            pos_hint: {"center_x": 0.5}
+
+        Label:
+            text: "AI Chessboard Detection"
+            font_size: "28sp"
+            bold: True
+            color: 1, 1, 1, 1
+            halign: "center"
+
+        Image:
+            source: "assets/queen.png"
+            size_hint: None, None
+            size: 500, 500
+            pos_hint: {"center_x": 0.5}
+
         Button:
-            text: "Welcome to Kivy Reloader!!!"
-        Button:
-            text: "Camera"
+            text: "Start Camera"
+            font_size: "20sp"
+            size_hint_y: None
+            height: 250
+            background_color: 0.6, 0.4, 0.2, 1  # Braun wie ein Schachbrett
             on_press:
                 print("Camera Button pressed")
                 root.manager.current = "camera_screen"
+
+        Button:
+            text: "Exit"
+            font_size: "20sp"
+            size_hint_y: None
+            height: 250
+            background_color: 0.5, 0.3, 0.1, 1
+            on_press: app.stop()
