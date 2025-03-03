@@ -157,7 +157,7 @@ class CameraScreen(Screen):
         
         Clock.schedule_once(self.get_frame, 0.25)
 
-    def test_opencv(self):
+    def testOpencv(self):
         cam = self.root.ids.a_cam
         image_object = cam.export_as_image(scale=round((400 / int(cam.height)), 2))
         w, h = image_object._texture.size
