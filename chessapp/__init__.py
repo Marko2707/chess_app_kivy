@@ -6,9 +6,6 @@ from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition, FallOu
 from kivy_reloader.app import App
 
 from kivy.utils import platform
-if platform == "android":
-    from android.permissions import request_permissions, Permission
-    request_permissions([Permission.INTERNET, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
 
 TRANSITION_DURATION = 0.25
 TRANSITION_LEFT = WipeTransition(duration=TRANSITION_DURATION)# left right?
@@ -18,9 +15,12 @@ screen_manager = ScreenManager(transition=TRANSITION_RIGHT)
 class MainApp(App):
     def on_start(self):
         from kivy.base import EventLoop
-        
         # Attach keyboard hook when app starts (Mainly for backbutton on Android)
         EventLoop.window.bind(on_keyboard=self.hook_keyboard)
+
+        if platform == "android":
+            from android.permissions import request_permissions, Permission
+            request_permissions([Permission.INTERNET, Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
 
     def hook_keyboard(self, window, key, *largs):
         # key == 27 means ESC but on android it is the back button
@@ -33,13 +33,14 @@ class MainApp(App):
         return True 
 
     def build(self):
-        #return MainScreen()
         # # Create the screen manager
         self.screen_manager = screen_manager
+        
         self.screen_manager.add_widget(MainScreen(name='main_screen'))
-        self.screen_manager.add_widget(CameraScreen(name='camera_screen'))
-        self.screen_manager.add_widget(Cv2PreProcessedScreen(name='cv2preprocessed_screen'))
-        # screens = [MainScreen(name='main'), CameraScreen(name='camera')]
-        # self.screen_manager.switch_to(screens[0])
+        if platform == "android":
+            self.screen_manager.add_widget(CameraScreen(name='camera_screen'))
+            self.screen_manager.add_widget(Cv2PreProcessedScreen(name='cv2preprocessed_screen'))
+        else:
+            self.screen_manager.add_widget(Screen(name='camera_screen'))
 
         return self.screen_manager

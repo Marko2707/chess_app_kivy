@@ -134,9 +134,10 @@ from kivy_reloader.utils import load_kv_path
 camera_screen_kv = os.path.join("chessapp", "screens", "camera_screen.kv")
 load_kv_path(camera_screen_kv)
 
-
 from kivy.uix.camera import Camera
 from kivy.clock import Clock
+from kivy.graphics.texture import Texture
+from kivy.graphics import Rectangle
 import numpy as np
 import cv2
 
@@ -149,24 +150,50 @@ class CameraScreen(Screen):
 #     Screen for camera functionality - displays live camera feed and captures photos
 #     """
 
-    def on_start(self):
-        Clock.schedule_once(self.get_frame, 5)
+    setup_done = False
 
-    def get_frame(self, dt):
-        self.test_opencv()
+    def setup_camera(self):
+        print("CameraScreen.setup_camera()")
+        if platform == "android":
+            from android.permissions import request_permissions, Permission
+            request_permissions([Permission.CAMERA])#, Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
+    
+    def on_enter(self):
+        print("CameraScreen.on_enter()")
+
+        if not self.setup_done:
+            self.setup_camera()
+            self.setup_done = True
+
+        cam = self.ids.a_cam
+        cam.play = True
+
+    def on_leave(self):
+        print("CameraScreen.on_leave()")
+        cam = self.ids.a_cam
+        if self.manager.current != 'cv2preprocessed_screen':
+            cam.play = False
+
+    # def on_start(self):
+    #     print("CameraScreen.on_start()")
+    #     #Clock.schedule_once(self.setup_camera, 5)
+
+    # def get_frame(self, dt):
+    #     self.testOpencv()
         
-        Clock.schedule_once(self.get_frame, 0.25)
+    #     Clock.schedule_once(self.get_frame, 0.25)
 
     def testOpencv(self):
-        cam = self.root.ids.a_cam
-        image_object = cam.export_as_image(scale=round((400 / int(cam.height)), 2))
+        cam = self.ids.a_cam
+        image_object = cam.export_as_image(scale=round((cam.camera_resolution[1] / int(cam.height)), 2))
         w, h = image_object._texture.size
         frame = np.frombuffer(image_object._texture.pixels, 'uint8').reshape(h, w, 4)
         gray = cv2.cvtColor(frame, cv2.COLOR_RGBA2GRAY)
-        # # Convert gray back to RGBA for displaying
-        # gray_rgba = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGBA)
-        # # Update the camera texture with the grayscale image
-        # texture = cam.texture.create(size=(w, h), colorfmt='rgba')
-        # texture.blit_buffer(gray_rgba.tobytes(), colorfmt='rgba', bufferfmt='ubyte')
-        # cam.texture = texture
-        print("test_opencv")
+
+        # Convert to kivy texture to display on the canvas
+        gray = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGBA) # Convert back to RGBA for displaying
+        texture = Texture.create(size=(gray.shape[1], gray.shape[0]))
+        texture.blit_buffer(gray.tobytes(), colorfmt='rgba', bufferfmt='ubyte')
+        self.ids.a_cam.canvas.before.clear()
+        with self.ids.a_cam.canvas:
+            Rectangle(texture=texture, size=self.ids.cv2_display.size, pos=self.ids.cv2_display.pos)
