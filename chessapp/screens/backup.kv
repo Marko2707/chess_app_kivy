@@ -1,0 +1,32 @@
+
+
+
+<ImageCropScreen>:
+    FloatLayout:
+        # Camera widget is temporarily commented out
+        # Camera:
+        #     id: camera
+        #     resolution: (1080, 1920)
+        #     play: True
+        #     index: 0
+
+        # Crop Widget (Handles drawing and resizing crop square)
+        CropWidget:
+            id: crop_widget
+            size_hint: None, None  # No automatic size scaling
+            size: 500, 500  # Starting size of the crop square
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}  # Centered on screen
+
+        # Processed Image (Full Screen)
+        Image:
+            id: processed_image
+            size_hint: (1, 1)
+            allow_stretch: True
+
+        # Button to capture image
+        Button:
+            id: capture_button
+            text: "Capture Image"
+            size_hint: (0.3, 0.1)
+            pos_hint: {"center_x": 0.5, "y": 0.05}
+            on_press: root.capture()

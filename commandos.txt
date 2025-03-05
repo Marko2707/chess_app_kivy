@@ -1,0 +1,18 @@
+adb devices --> Windows shell
+adb tcpip 5555
+
+linux wsl:
+3shells:
+
+bei allen 3:
+poetry shell
+
+1:
+adb connect "Telefon IPv4" Falls nicht klappt das ranhängen(:5555) 192.168.0.30
+kivy-reloader run
+
+2:
+python main.py
+
+3:
+scrcpy

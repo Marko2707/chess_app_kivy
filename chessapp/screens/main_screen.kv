@@ -2,7 +2,9 @@
     BoxLayout:
         orientation: "vertical"
         Button:
-            text: "Welcome to Kivy Reloader!!!"
+            text: "Manual Image Crop"
+            on_press:
+                root.manager.current = "imagecrop_screen"
         Button:
             text: "Camera"
             on_press:

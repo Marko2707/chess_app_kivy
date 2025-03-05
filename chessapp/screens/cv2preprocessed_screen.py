@@ -21,6 +21,12 @@ class Cv2PreProcessedScreen(Screen):
 
         # # Convert gray back to RGBA for displaying
         gray = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGBA)
+        gray = cv2.flip(gray, 0)  # Flip vertically
+
+        # 5️⃣ Draw rectangle
+        cv2.rectangle(gray, (50, 50), (200, 200), (255, 0, 0, 255), 2)
+
+        #gray = cv2.rotate(gray, cv2.ROTATE_180)
         # # Update the camera texture with the grayscale image
         # texture = cam.texture.create(size=(w, h), colorfmt='rgba')
         # texture.blit_buffer(gray_rgba.tobytes(), colorfmt='rgba', bufferfmt='ubyte')

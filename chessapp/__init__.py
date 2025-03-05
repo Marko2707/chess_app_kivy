@@ -1,4 +1,5 @@
 from chessapp.screens.main_screen import MainScreen
+from chessapp.screens.imagecrop_screen import ImageCropScreen
 from chessapp.screens.camera_screen import CameraScreen
 from chessapp.screens.cv2preprocessed_screen import Cv2PreProcessedScreen
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition, FallOutTransition, RiseInTransition, WipeTransition, NoTransition
@@ -39,6 +40,8 @@ class MainApp(App):
         self.screen_manager.add_widget(MainScreen(name='main_screen'))
         self.screen_manager.add_widget(CameraScreen(name='camera_screen'))
         self.screen_manager.add_widget(Cv2PreProcessedScreen(name='cv2preprocessed_screen'))
+        self.screen_manager.add_widget(ImageCropScreen(name='imagecrop_screen'))
+
         # screens = [MainScreen(name='main'), CameraScreen(name='camera')]
         # self.screen_manager.switch_to(screens[0])
 
