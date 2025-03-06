@@ -13,9 +13,15 @@ def get_square_corners_on_original(image, corners):
     # Assign the input points to meaningful names
     A1, A8, H1, H8 = corners
 
+    print("A1:", A1)
+    print("H8:", H8)
+
     # Define target coordinates for top-down view (chessboard from bird's eye view)
-    width = 640  
-    height = 480  
+  
+    screen_height, screen_width = image.shape[:2]  # Correct way for OpenCV images
+    print(screen_height, screen_width, "RESOLUTIN")
+    width = screen_width  
+    height = screen_height  
     dst_points = np.float32([
         [0, 0],      # A1 (Top-left in the transformed view)
         [0, height-1],  # A8 (Bottom-left in the transformed view)
@@ -48,8 +54,17 @@ def get_square_corners_on_original(image, corners):
             top_right_original = cv2.perspectiveTransform(np.array([[top_right_corner]], dtype=np.float32), inverse_matrix)[0][0]
             bottom_left_original = cv2.perspectiveTransform(np.array([[bottom_left_corner]], dtype=np.float32), inverse_matrix)[0][0]
             bottom_right_original = cv2.perspectiveTransform(np.array([[bottom_right_corner]], dtype=np.float32), inverse_matrix)[0][0]
+ 
+            # Flipping  to adjust for before
+            top_left_original[1] = height - top_left_original[1]
+            top_right_original[1] = height - top_right_original[1]
+            bottom_left_original[1] = height - bottom_left_original[1]
+            bottom_right_original[1] = height - bottom_right_original[1]
 
-            field_label = chr(65 + j) + str(8 - i)  # A1, B1, ..., H8
+            # Adjust the labels based on the flipped rows
+            i_flipped = 7 - i  # Flip the row index
+            field_label = chr(65 + j) + str(8 - i_flipped)  # +1 to adjust to 1-based indexing
+
             field_corners = [
                 (top_left_original[0], top_left_original[1]),
                 (top_right_original[0], top_right_original[1]),
@@ -57,6 +72,14 @@ def get_square_corners_on_original(image, corners):
                 (bottom_left_original[0], bottom_left_original[1])
             ]
             fields.append((field_label, field_corners))
+            # field_label = chr(65 + j) + str(8 - i)  # A1, B1, ..., H8
+            # field_corners = [
+            #     (top_left_original[0], top_left_original[1]),
+            #     (top_right_original[0], top_right_original[1]),
+            #     (bottom_right_original[0], bottom_right_original[1]),
+            #     (bottom_left_original[0], bottom_left_original[1])
+            # ]
+            # fields.append((field_label, field_corners))
 
     return fields
 
@@ -72,7 +95,7 @@ def draw_chessboard(image, fields):
     img_copy = image.copy()
 
     for field_label, corners in fields:
-        print(f"Drawing field: {field_label} with corners: {corners}")
+        #print(f"Drawing field: {field_label} with corners: {corners}")
         
         # Convert corner coordinates to integer explicitly
         pts = np.array([(int(x), int(y)) for x, y in corners], dtype=np.int32)
@@ -85,7 +108,7 @@ def draw_chessboard(image, fields):
         center_y = int(sum(y for x, y in corners) / 4)
 
         # Draw the label in the center
-        print(f"Center: ({center_x}, {center_y})")
+        #print(f"Center: ({center_x}, {center_y})")
         cv2.putText(img_copy, field_label, (center_x - 10, center_y + 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2, cv2.LINE_AA)
 
