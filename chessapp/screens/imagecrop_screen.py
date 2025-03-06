@@ -63,6 +63,7 @@ class ImageCropScreen(Screen):
             image = np.frombuffer(pixels, dtype=np.uint8).reshape(size[1], size[0], 4)
             image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
             self.display_image(image)
+
         
     def display_image(self, image):
         self.clear_widgets()  # Remove previous widgets (camera, buttons, etc.)
@@ -70,13 +71,15 @@ class ImageCropScreen(Screen):
         # Store the captured image for later use
         self.captured_image = image  # Store it in the instance for later access
         image = cv2.flip(image, 1)
+        print("Image Res: ", image.shape[:2])
+        
         # Display the captured image
         buf1 = image.tobytes()  # Use the original image without flipping 
         texture = Texture.create(size=(image.shape[1], image.shape[0]), colorfmt='rgb')
         texture.blit_buffer(buf1, colorfmt='rgb', bufferfmt='ubyte')
         img_widget = Widget()
         with img_widget.canvas:
-            Rectangle(texture=texture, pos=(0, 0), size=Window.size)
+            Rectangle(texture=texture, pos=(0, 0), size=(image.shape[1], image.shape[0]))
 
         with img_widget.canvas.before:
             PushMatrix()
@@ -96,9 +99,14 @@ class ImageCropScreen(Screen):
         self.add_widget(self.crop_widget)
 
         # Add a button to save/get the dot positions
-        save_button = Button(text='Save Positions', size_hint=(None, None), size=(300, 150),
+        save_button = Button(text='Save Positions', size_hint=(None, None), size=(450, 150),
                             pos_hint={'center_x': 0.5, 'y': 0.05})
         save_button.bind(on_press=self.save_positions)
+        
+        # This is important to not mess up the pixel detection later to get the squares:
+        save_button.padding = [0, 0]  # Remove any internal padding
+        save_button.margin = [0, 0]   # Remove any margin if set
+
         self.add_widget(save_button)
 
         
@@ -109,39 +117,40 @@ class ImageCropScreen(Screen):
         
         # Retrieve and print the coordinates for each dot based on its label.
         coords = {dot["label"]: dot["pos"] for dot in self.crop_widget.dots}
-        
-
-        image_width, image_height = 640, 480
-        # Get the screen width and height
-        screen_width, screen_height = Window.size
-        print(f"Screen width: {screen_width}, Screen height: {screen_height}")
-
-        # Calculate scaling factors for x and y
-        scale_x = image_width / screen_width
-        scale_y = image_height / screen_height
-        print("TEST1")
         print(coords)
-        # Scale the coordinates in the coords dictionary
-        # Assuming scale_x and scale_y are calculated correctly
-        coords = {label: [x * scale_x, y * scale_y] for label, [x, y] in coords.items()}
 
-        print("TEST2")
+        # image_width, image_height = 640, 480
+        # # Get the screen width and height
+        # screen_width, screen_height = Window.size
+        # print(f"Screen width: {screen_width}, Screen height: {screen_height}")
+
+        # # Calculate scaling factors for x and y
+        # scale_x = image_width / screen_width
+        # scale_y = image_height / screen_height
+        # print("TEST1")
+   
+        # # Scale the coordinates in the coords dictionary
+        # # Assuming scale_x and scale_y are calculated correctly
+        # coords = {label: [x * scale_x, y * scale_y] for label, [x, y] in coords.items()}
+
+        # print("TEST2")
+        button_height = 150  # Your button's height
+        coords = {label: [x, y - button_height] for label, (x, y) in coords.items()}
+
 
         # Make sure all 4 corners are set
         if all(label in coords for label in ["A1", "A8", "H1", "H8"]):
             ordered_corners = [coords["A1"], coords["A8"], coords["H1"], coords["H8"]]
-            
+            print(ordered_corners)
+
             # Call function to compute square positions
             fields = get_square_corners_on_original(self.captured_image, ordered_corners)
             
             # Print or store the results
             #print("Computed field positions:", fields)
-            import pprint
-
-            pprint.pprint(fields)
+            
 
             img_copy = draw_chessboard(self.captured_image, fields)
-            print("HALLO")
             save_path = "/storage/emulated/0/Download/test_output.jpg"  # Save in Downloads folder
             cv2.imwrite(save_path, img_copy)
 
@@ -170,7 +179,7 @@ class CropWidget(Widget):
         self.update_positions()
 
     def update_positions(self, *args):
-        offset = 150  # 150 is 100 pixels more than the original 50
+        offset = 400  
         self.dots[0]["pos"] = [self.x + offset, self.y + offset]           # Bottom-left becomes 100px closer to center
         self.dots[1]["pos"] = [self.right - offset, self.y + offset]         # Bottom-right
         self.dots[2]["pos"] = [self.right - offset, self.top - offset]         # Top-right
@@ -220,6 +229,9 @@ class CropWidget(Widget):
     def on_touch_up(self, touch):
         self.selected_dot = None
         return super(CropWidget, self).on_touch_up(touch)
+
+
+
 
 
 
