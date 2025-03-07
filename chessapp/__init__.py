@@ -1,6 +1,7 @@
 from chessapp.screens.main_screen import MainScreen
 from chessapp.screens.camera_screen import CameraScreen
 from chessapp.screens.cv2preprocessed_screen import Cv2PreProcessedScreen
+from chessapp.screens.imagecrop_screen import ImageCropScreen
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition, FallOutTransition, RiseInTransition, WipeTransition, NoTransition
 
 from kivy_reloader.app import App
@@ -27,7 +28,7 @@ class MainApp(App):
         if key == 27:
             if self.screen_manager.current != 'main_screen': # No action if we are at mainscreen
                 self.screen_manager.transition = TRANSITION_LEFT # testing transitions
-                self.screen_manager.current = self.screen_manager.previous()
+                self.screen_manager.current = 'main_screen'
                 self.screen_manager.transition = TRANSITION_RIGHT
                 # self.screen_manager.switch_to(self.screen_manager.previous()) # Doesnt work because its expects scene not name
         return True 
@@ -40,6 +41,7 @@ class MainApp(App):
         if platform == "android":
             self.screen_manager.add_widget(CameraScreen(name='camera_screen'))
             self.screen_manager.add_widget(Cv2PreProcessedScreen(name='cv2preprocessed_screen'))
+            self.screen_manager.add_widget(ImageCropScreen(name='imagecrop_screen'))
         else:
             self.screen_manager.add_widget(Screen(name='camera_screen'))
 

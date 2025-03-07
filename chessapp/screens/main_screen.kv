@@ -40,6 +40,16 @@
                 root.manager.current = "camera_screen"
 
         Button:
+            text: "Manual Approach"
+            font_size: "20sp"
+            size_hint_y: None
+            height: 250
+            background_color: 0.6, 0.4, 0.2, 1
+            on_press:
+                print("Initialized Manual Corner Based Approach")
+                root.manager.current = "imagecrop_screen"
+
+        Button:
             text: "TestBrowser"
             font_size: "20sp"
             size_hint_y: None
