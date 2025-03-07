@@ -55,6 +55,7 @@ class CameraScreen(Screen):
             pixels = texture.pixels
             image = np.frombuffer(pixels, dtype=np.uint8).reshape(size[1], size[0], 4)
             image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
+            #image = cv2.resize(image, (1140, 2810))
             self.display_image(image)
      
 
@@ -75,7 +76,7 @@ class CameraScreen(Screen):
         img_widget = Widget()
         #with img_widget.canvas:
         with self.camera.canvas:
-            Rectangle(texture=texture)
+            Rectangle(texture=texture, pos=(0, 0), size=(image.shape[1], image.shape[0]))
 
         with self.camera.canvas.before:
             PushMatrix()
@@ -148,8 +149,8 @@ class CameraScreen(Screen):
             # Convert BGR to RGB
             img_rgb = cv2.cvtColor(img_copy, cv2.COLOR_BGR2RGB)
 
-            # Flip image vertically to align with Kivy's coordinate system
-            #img_rgb = cv2.flip(img_rgb, 0)
+            # Flip image horizontally to align with Kivy's coordinate system
+            img_rgb = cv2.flip(img_rgb, 1)
 
             # Convert to texture
             texture = Texture.create(size=(img_rgb.shape[1], img_rgb.shape[0]), colorfmt='rgb')
@@ -161,9 +162,22 @@ class CameraScreen(Screen):
             # else:
             #     self.image_widget = Image(texture=texture)
             #     self.add_widget(self.image_widget)  # Add to layoutut
-            self.camera.canvas.before.clear()
+            #self.camera.canvas.before.clear()
+
+            screen_height, screen_width = img_rgb.shape[:2]  # Correct way for OpenCV images
+            print(screen_height, screen_width, "After")
+
             with self.camera.canvas:
-                Rectangle(texture=texture)
+                Rectangle(texture=texture, size=(img_rgb.shape[1], img_rgb.shape[0]))
+            
+            with self.camera.canvas.before:
+                PushMatrix()
+                Rotate(
+                    angle=0,
+                    origin=self.center,
+                ),
+            with self.camera.canvas.after:
+                PopMatrix()
 
         else:
             print("Not all 4 corners have been set!")

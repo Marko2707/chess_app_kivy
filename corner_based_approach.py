@@ -17,9 +17,9 @@ def get_square_corners_on_original(image, corners):
     print("H8:", H8)
 
     # Define target coordinates for top-down view (chessboard from bird's eye view)
-  
+    
     screen_height, screen_width = image.shape[:2]  # Correct way for OpenCV images
-    print(screen_height, screen_width, "RESOLUTIN")
+    print(screen_height, screen_width, "Before")
     width = screen_width  
     height = screen_height  
     dst_points = np.float32([
@@ -111,5 +111,4 @@ def draw_chessboard(image, fields):
         #print(f"Center: ({center_x}, {center_y})")
         cv2.putText(img_copy, field_label, (center_x - 10, center_y + 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2, cv2.LINE_AA)
-
     return img_copy
