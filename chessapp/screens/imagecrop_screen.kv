@@ -1,34 +1,16 @@
-<CameraScreen>:
+<ImageCropScreen>:
     orientation: 'vertical'
     size: root.width, root.height
-
+    
     GridLayout:
         rows: 2
 
-        Button:
-            text: 'opencv'
-            size_hint: None, None
-            size: 300, 150
-            pos_hint: {'x': 0.5, 'y': 0.95}
-            on_release: 
-                #print("opencv")
-                root.manager.current = "cv2preprocessed_screen"
-                #root.testOpencv()
-
-        Button:
-            text: "Capture"
-            size_hint: None, None
-            size: 300, 150
-            pos_hint: {"center_x": 0.5, "y": 0.05}
-            on_press: root.capture(self)
-
         RelativeLayout:
-            size_hint: 1, 1
-
+            size_hint: 1, 0.8
+            
             AndroidCamera:
                 index: 0
                 id: camera
-                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                 resolution: self.camera_resolution
                 allow_stretch: True
                 keep_ratio: True
@@ -45,4 +27,9 @@
                 canvas.after:
                     PopMatrix
 
-        
+        Button:
+            text: "Capture"
+            size_hint: None, None
+            size: 300, 150
+            pos_hint: {"center_x": 0.5, "y": 0.05}
+            on_press: root.capture(self)

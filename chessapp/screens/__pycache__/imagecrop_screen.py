@@ -1,49 +1,44 @@
-from kivy.utils import platform
-if platform == "android":
-    from android.storage import primary_external_storage_path
-else:
-    def primary_external_storage_path(): 
-        print("primary_external_storage_path() not implemented for this platform")
-        return ""
-
-from kivy.uix.screenmanager import Screen
 import os
-from kivy_reloader.utils import load_kv_path
-
-camera_screen_kv = os.path.join("chessapp", "screens", "camera_screen.kv")
-load_kv_path(camera_screen_kv)
-
-from kivy.uix.camera import Camera
-from kivy.clock import Clock
-from kivy.graphics.texture import Texture
-from kivy.graphics import Rectangle, Line, Color, Ellipse, PushMatrix, Rotate, Scale, PopMatrix
-import numpy as np
 import cv2
-import os
+import numpy as np
 from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
+from kivy.graphics import Line, Color, Ellipse, Rectangle
+from kivy.graphics.texture import Texture
 from kivy.uix.button import Button
 from kivy_reloader.utils import load_kv_path
+from kivy.uix.camera import Camera
 from kivy.core.window import Window
 from kivy.core.text import Label as CoreLabel
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.screenmanager import Screen
+from kivy.uix.button import Button
+from kivy.uix.camera import Camera
+from kivy.graphics import PushMatrix, Rotate, Scale, PopMatrix
+from kivy.core.window import Window
 from kivy.app import App
 from kivy.core.image import Image as CoreImage
 from kivy.uix.image import Image
+from kivy.graphics.texture import Texture
+
+
 
 from corner_based_approach import get_square_corners_on_original, draw_chessboard
+
+imagecrop_screen = os.path.join("chessapp", "screens", "imagecrop_screen.kv")
+load_kv_path(imagecrop_screen)
+
 
 class AndroidCamera(Camera):
     camera_resolution = (640, 480)
     cam_ratio = camera_resolution[0] / camera_resolution[1]
-    
-class CameraScreen(Screen):
-#     """
-#     Screen for camera functionality - displays live camera feed and captures photos
-#     """
+
+
+class ImageCropScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.camera = self.ids.camera
+   
 
     def capture(self, instance):
         # Capture the frame from the camera
@@ -59,8 +54,8 @@ class CameraScreen(Screen):
      
 
     def display_image(self, image):
-        #self.clear_widgets()  # Remove previous widgets (camera, buttons, etc.)
-        self.camera.play = False
+        self.clear_widgets()  # Remove previous widgets (camera, buttons, etc.)
+
         # Store the captured image for later use
         self.captured_image = image  # Store it in the instance for later access
         image = cv2.flip(image, 1)
@@ -73,30 +68,21 @@ class CameraScreen(Screen):
         texture = Texture.create(size=(image.shape[1], image.shape[0]), colorfmt='rgb')
         texture.blit_buffer(buf1, colorfmt='rgb', bufferfmt='ubyte')
         img_widget = Widget()
-        #with img_widget.canvas:
-        with self.camera.canvas:
-            Rectangle(texture=texture)
+        with img_widget.canvas:
+            Rectangle(texture=texture, pos=(0, 0), size=(image.shape[1], image.shape[0]))
+            Rectangle(texture=texture, pos=(0, 0), size=(image.shape[1], image.shape[0]))
 
-        with self.camera.canvas.before:
+        with img_widget.canvas.before:
             PushMatrix()
             Rotate(
-                angle=-90,
+                angle=180,
                 origin=self.center,
             ),
-        with self.camera.canvas.after:
-            PopMatrix()
-
-        # with img_widget.canvas.before:
-        #     PushMatrix()
-        #     Rotate(
-        #         angle=180,
-        #         origin=self.center,
-        #     ),
       
         # Apply PopMatrix after transformations are done
-        # with img_widget.canvas.after:
-        #     PopMatrix()
-        # self.add_widget(img_widget)
+        with img_widget.canvas.after:
+            PopMatrix()
+        self.add_widget(img_widget)
 
         # Create the CropWidget overlay with draggable dots
         self.crop_widget = CropWidget(size=Window.size, pos=(0, 0))
@@ -106,6 +92,11 @@ class CameraScreen(Screen):
         save_button = Button(text='Save Positions', size_hint=(None, None), size=(450, 150),
                             pos_hint={'center_x': 0.5, 'y': 0.05})
         save_button.bind(on_press=self.save_positions)
+        
+        # This is important to not mess up the pixel detection later to get the squares:
+        save_button.padding = [0, 0]  # Remove any internal padding
+        save_button.margin = [0, 0]   # Remove any margin if set
+
         
         # This is important to not mess up the pixel detection later to get the squares:
         save_button.padding = [0, 0]  # Remove any internal padding
@@ -123,8 +114,8 @@ class CameraScreen(Screen):
         coords = {dot["label"]: dot["pos"] for dot in self.crop_widget.dots}
         print(coords)
 
-        # button_height = 150  # Your button's height
-        # coords = {label: [x, y - button_height] for label, (x, y) in coords.items()}
+        button_height = 150  # Your button's height
+        coords = {label: [x, y - button_height] for label, (x, y) in coords.items()}
 
         # Make sure all 4 corners are set
         if all(label in coords for label in ["A1", "A8", "H1", "H8"]):
@@ -149,52 +140,24 @@ class CameraScreen(Screen):
             img_rgb = cv2.cvtColor(img_copy, cv2.COLOR_BGR2RGB)
 
             # Flip image vertically to align with Kivy's coordinate system
-            #img_rgb = cv2.flip(img_rgb, 0)
+            img_rgb = cv2.flip(img_rgb, 0)
 
             # Convert to texture
             texture = Texture.create(size=(img_rgb.shape[1], img_rgb.shape[0]), colorfmt='rgb')
             texture.blit_buffer(img_rgb.tobytes(), colorfmt='rgb', bufferfmt='ubyte')
 
             # Display the image in the app
-            # if hasattr(self, 'image_widget'):
-            #     self.image_widget.texture = texture  # Update existing image
-            # else:
-            #     self.image_widget = Image(texture=texture)
-            #     self.add_widget(self.image_widget)  # Add to layoutut
-            self.camera.canvas.before.clear()
-            with self.camera.canvas:
-                Rectangle(texture=texture)
+            if hasattr(self, 'image_widget'):
+                self.image_widget.texture = texture  # Update existing image
+            else:
+                self.image_widget = Image(texture=texture)
+                self.add_widget(self.image_widget)  # Add to layoutut
 
         else:
             print("Not all 4 corners have been set!")
         
         # Fields are the coordinates of the task
         return fields
-
-    setup_done = False
-
-    def setup_camera(self):
-        print("CameraScreen.setup_camera()")
-        if platform == "android":
-            from android.permissions import request_permissions, Permission
-            request_permissions([Permission.CAMERA])#, Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
-        self.setup_done = True
-
-    def on_enter(self):
-        print("CameraScreen.on_enter()")
-
-        if not self.setup_done:
-            self.setup_camera()
-            
-
-        self.camera.play = True
-
-    def on_leave(self):
-        print("CameraScreen.on_leave()")
-   
-        if self.manager.current != 'cv2preprocessed_screen':
-            self.camera.play = False
-
 
 
 class CropWidget(Widget):
@@ -266,4 +229,11 @@ class CropWidget(Widget):
     def on_touch_up(self, touch):
         self.selected_dot = None
         return super(CropWidget, self).on_touch_up(touch)
+
+
+
+
+
+
+
 

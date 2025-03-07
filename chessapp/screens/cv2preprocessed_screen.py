@@ -33,7 +33,7 @@ class Cv2PreProcessedScreen(Screen):
     def processImage(self, *args):
         if self.manager.current != 'cv2preprocessed_screen':
             return
-        cam = self.manager.get_screen('camera_screen').ids.a_cam
+        cam = self.manager.get_screen('camera_screen').ids.camera
         image_object = cam.export_as_image(scale=round((cam.camera_resolution[1] / int(cam.height)), 2))
         w, h = image_object._texture.size
         frame = np.frombuffer(image_object._texture.pixels, 'uint8').reshape(h, w, 4)

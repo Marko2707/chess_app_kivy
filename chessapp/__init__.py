@@ -40,6 +40,7 @@ class MainApp(App):
         if platform == "android":
             self.screen_manager.add_widget(CameraScreen(name='camera_screen'))
             self.screen_manager.add_widget(Cv2PreProcessedScreen(name='cv2preprocessed_screen'))
+            
         else:
             self.screen_manager.add_widget(Screen(name='camera_screen'))
 
