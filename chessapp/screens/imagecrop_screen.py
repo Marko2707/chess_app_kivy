@@ -1,21 +1,25 @@
-from kivy.uix.camera import Camera
-from kivy.clock import Clock
-from kivy.graphics.texture import Texture
-from kivy.graphics import Rectangle, Line, Color, Ellipse, PushMatrix, Rotate, Scale, PopMatrix
-import numpy as np
-import cv2
 import os
+import cv2
+import numpy as np
 from kivy.uix.screenmanager import Screen
 from kivy.uix.widget import Widget
+from kivy.graphics import Line, Color, Ellipse, Rectangle
+from kivy.graphics.texture import Texture
 from kivy.uix.button import Button
 from kivy_reloader.utils import load_kv_path
+from kivy.uix.camera import Camera
 from kivy.core.window import Window
 from kivy.core.text import Label as CoreLabel
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.screenmanager import Screen
+from kivy.uix.button import Button
+from kivy.uix.camera import Camera
+from kivy.graphics import PushMatrix, Rotate, Scale, PopMatrix
+from kivy.core.window import Window
 from kivy.app import App
 from kivy.core.image import Image as CoreImage
 from kivy.uix.image import Image
-
+from kivy.graphics.texture import Texture
 
 
 
@@ -98,11 +102,6 @@ class ImageCropScreen(Screen):
         save_button.padding = [0, 0]  # Remove any internal padding
         save_button.margin = [0, 0]   # Remove any margin if set
 
-        
-        # This is important to not mess up the pixel detection later to get the squares:
-        save_button.padding = [0, 0]  # Remove any internal padding
-        save_button.margin = [0, 0]   # Remove any margin if set
-
         self.add_widget(save_button)
 
         
@@ -115,8 +114,8 @@ class ImageCropScreen(Screen):
         coords = {dot["label"]: dot["pos"] for dot in self.crop_widget.dots}
         print(coords)
 
-        button_height = 150  # Your button's height
-        coords = {label: [x, y - button_height] for label, (x, y) in coords.items()}
+        #button_height = 150  # Your button's height
+        #coords = {label: [x, y + button_height] for label, (x, y) in coords.items()}
 
         # Make sure all 4 corners are set
         if all(label in coords for label in ["A1", "A8", "H1", "H8"]):

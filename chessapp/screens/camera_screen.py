@@ -7,6 +7,127 @@ else:
         return ""
 
 from kivy.uix.screenmanager import Screen
+
+# from kivy.app import App
+# from kivy.uix.boxlayout import BoxLayout
+# from kivy.graphics.texture import Texture
+# from kivy.lang import Builder
+# import numpy as np
+# import cv2
+# import platform
+# import os
+# from kivy.uix.screenmanager import Screen
+# from plyer import camera as Camera
+# #from kivy.uix.camera import Camera
+
+# from kivy_reloader.utils import load_kv_path
+
+# camera_screen_kv = os.path.join("chessapp", "screens", "camera_screen.kv")
+# load_kv_path(camera_screen_kv)
+
+# # Only import camera module on Android
+# if platform.system() == 'Linux' and 'ANDROID_ARGUMENT' in os.environ:
+    
+#     class AndroidCamera(Camera):
+#         # pass
+#         camera_resolution = (640, 480)
+#         counter = 0
+
+#         def _camera_loaded(self, *largs):
+#             self.texture = Texture.create(size=np.flip(self.camera_resolution), colorfmt='rgb')
+#             self.texture_size = list(self.texture.size)
+
+#         def on_tex(self, *l):
+#             if self._camera._buffer is None:
+#                 return None
+#             frame = self.frame_from_buf()
+#             self.frame_to_screen(frame)
+#             super(AndroidCamera, self).on_tex(*l)
+
+#         def frame_from_buf(self):
+#             w, h = self.resolution
+#             frame = np.frombuffer(self._camera._buffer.tostring(), 'uint8').reshape((h + h // 2, w))
+#             frame_bgr = cv2.cvtColor(frame, 93)
+#             return np.rot90(frame_bgr, 3)
+
+#         def frame_to_screen(self, frame):
+#             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#             cv2.putText(frame_rgb, str(self.counter), (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+#             self.counter += 1
+#             flipped = np.flip(frame_rgb, 0)
+#             buf = flipped.tostring()
+#             self.texture.blit_buffer(buf, colorfmt='rgb', bufferfmt='ubyte')
+
+# class CameraScreen(Screen):
+#     pass
+
+# """
+# Basic camera example
+# Default picture is saved as
+# /sdcard/org.test.cameraexample/enter_file_name_here.jpg
+# """
+
+# from os import getcwd
+# from os.path import exists
+# import os
+
+# from kivy.app import App
+
+# from plyer import camera
+
+# from kivy_reloader.utils import load_kv_path
+
+# camera_screen_kv = os.path.join("chessapp", "screens", "camera_screen.kv")
+# load_kv_path(camera_screen_kv)
+
+# class CameraScreen(Screen):
+
+#     def on_enter(self):
+#         if platform == "android":
+#             from android.permissions import request_permissions, Permission
+#             request_permissions([Permission.CAMERA, Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
+#         print("CameraScreen.on_enter()")
+
+#     def on_leave(self):
+#         print("CameraScreen.on_leave()")
+
+#     def do_capture(self):
+#         #self.cwd = getcwd() + "/"
+#         #self.ids.path_label.text = self.cwd
+#         #filepath = self.cwd + self.ids.filename_text.text
+#         filepath = primary_external_storage_path() + "/" + "test.jpg"
+
+#         if exists(filepath):
+#             # popup = MsgPopup("Picture with this name already exists!")
+#             # popup.open()
+#             print("Picture with this name already exists!")
+#             return False
+
+#         try:
+#             camera.take_picture(filename=filepath,
+#                                 on_complete=self.camera_callback)
+#         except NotImplementedError:
+#             # popup = MsgPopup(
+#             #     "This feature has not yet been implemented for this platform.")
+#             # popup.open()
+#             print("This feature has not yet been implemented for this platform.")
+
+#     def camera_callback(self, filepath):
+#         if exists(filepath):
+#             # popup = MsgPopup("Picture saved!")
+#             # popup.open()
+#             print("Picture saved!")
+#         else:
+#             # popup = MsgPopup("Could not save your picture!")
+#             # popup.open()
+#             print("Could not save your picture!")
+
+
+# from kivy.lang import Builder
+# from kivy.utils import platform
+# from kivy.clock import Clock
+# from plyer import camera
+
 import os
 from kivy_reloader.utils import load_kv_path
 
@@ -16,22 +137,9 @@ load_kv_path(camera_screen_kv)
 from kivy.uix.camera import Camera
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-from kivy.graphics import Rectangle, Line, Color, Ellipse, PushMatrix, Rotate, Scale, PopMatrix
+from kivy.graphics import Rectangle
 import numpy as np
 import cv2
-import os
-from kivy.uix.screenmanager import Screen
-from kivy.uix.widget import Widget
-from kivy.uix.button import Button
-from kivy_reloader.utils import load_kv_path
-from kivy.core.window import Window
-from kivy.core.text import Label as CoreLabel
-from kivy.uix.boxlayout import BoxLayout
-from kivy.app import App
-from kivy.core.image import Image as CoreImage
-from kivy.uix.image import Image
-
-from corner_based_approach import get_square_corners_on_original, draw_chessboard
 
 class AndroidCamera(Camera):
     camera_resolution = (640, 480)
@@ -41,149 +149,6 @@ class CameraScreen(Screen):
 #     """
 #     Screen for camera functionality - displays live camera feed and captures photos
 #     """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.camera = self.ids.camera
-
-    def capture(self, instance):
-        # Capture the frame from the camera
-        # texture = self.camera.texture
-        texture = self.camera.export_as_image()
-        texture = texture._texture
-        if texture:
-            size = texture.size
-            pixels = texture.pixels
-            image = np.frombuffer(pixels, dtype=np.uint8).reshape(size[1], size[0], 4)
-            image = cv2.cvtColor(image, cv2.COLOR_RGBA2RGB)
-            #image = cv2.resize(image, (1140, 2810))
-            self.display_image(image)
-     
-
-    def display_image(self, image):
-        #self.clear_widgets()  # Remove previous widgets (camera, buttons, etc.)
-        self.camera.play = False
-        # Store the captured image for later use
-        self.captured_image = image  # Store it in the instance for later access
-        image = cv2.flip(image, 1)
-        print("Image Res: ", image.shape[:2])
-        
-        print("Image Res: ", image.shape[:2])
-        
-        # Display the captured image
-        buf1 = image.tobytes()  # Use the original image without flipping 
-        texture = Texture.create(size=(image.shape[1], image.shape[0]), colorfmt='rgb')
-        texture.blit_buffer(buf1, colorfmt='rgb', bufferfmt='ubyte')
-        img_widget = Widget()
-        #with img_widget.canvas:
-        with self.camera.canvas:
-            Rectangle(texture=texture, pos=(0, 0), size=(image.shape[1], image.shape[0]))
-
-        with self.camera.canvas.before:
-            PushMatrix()
-            Rotate(
-                angle=-90,
-                origin=self.center,
-            ),
-        with self.camera.canvas.after:
-            PopMatrix()
-
-        # with img_widget.canvas.before:
-        #     PushMatrix()
-        #     Rotate(
-        #         angle=180,
-        #         origin=self.center,
-        #     ),
-      
-        # Apply PopMatrix after transformations are done
-        # with img_widget.canvas.after:
-        #     PopMatrix()
-        # self.add_widget(img_widget)
-
-        # Create the CropWidget overlay with draggable dots
-        self.crop_widget = CropWidget(size=Window.size, pos=(0, 0))
-        self.add_widget(self.crop_widget)
-
-        # Add a button to save/get the dot positions
-        save_button = Button(text='Save Positions', size_hint=(None, None), size=(450, 150),
-                            pos_hint={'center_x': 0.5, 'y': 0.05})
-        save_button.bind(on_press=self.save_positions)
-        
-        # This is important to not mess up the pixel detection later to get the squares:
-        save_button.padding = [0, 0]  # Remove any internal padding
-        save_button.margin = [0, 0]   # Remove any margin if set
-
-        self.add_widget(save_button)
-
-        
-    def save_positions(self, instance):
-        if not hasattr(self, 'captured_image'):
-            print("No image captured yet!")
-            return
-        
-        # Retrieve and print the coordinates for each dot based on its label.
-        coords = {dot["label"]: dot["pos"] for dot in self.crop_widget.dots}
-        print(coords)
-
-        # button_height = 150  # Your button's height
-        # coords = {label: [x, y - button_height] for label, (x, y) in coords.items()}
-
-        # Make sure all 4 corners are set
-        if all(label in coords for label in ["A1", "A8", "H1", "H8"]):
-            ordered_corners = [coords["A1"], coords["A8"], coords["H1"], coords["H8"]]
-            print(ordered_corners)
-
-            print(ordered_corners)
-
-            # Call function to compute square positions
-            fields = get_square_corners_on_original(self.captured_image, ordered_corners)
-            
-            # Print or store the results
-            print("Computed field positions:", fields)
-            
-
-            img_copy = draw_chessboard(self.captured_image, fields)
-
-            #save_path = "/storage/emulated/0/Download/test_output.jpg"  # Save in Downloads folder
-            #cv2.imwrite(save_path, img_copy)
-
-            # Convert BGR to RGB
-            img_rgb = cv2.cvtColor(img_copy, cv2.COLOR_BGR2RGB)
-
-            # Flip image horizontally to align with Kivy's coordinate system
-            img_rgb = cv2.flip(img_rgb, 1)
-
-            # Convert to texture
-            texture = Texture.create(size=(img_rgb.shape[1], img_rgb.shape[0]), colorfmt='rgb')
-            texture.blit_buffer(img_rgb.tobytes(), colorfmt='rgb', bufferfmt='ubyte')
-
-            # Display the image in the app
-            # if hasattr(self, 'image_widget'):
-            #     self.image_widget.texture = texture  # Update existing image
-            # else:
-            #     self.image_widget = Image(texture=texture)
-            #     self.add_widget(self.image_widget)  # Add to layoutut
-            #self.camera.canvas.before.clear()
-
-            screen_height, screen_width = img_rgb.shape[:2]  # Correct way for OpenCV images
-            print(screen_height, screen_width, "After")
-
-            with self.camera.canvas:
-                Rectangle(texture=texture, size=(img_rgb.shape[1], img_rgb.shape[0]))
-            
-            with self.camera.canvas.before:
-                PushMatrix()
-                Rotate(
-                    angle=0,
-                    origin=self.center,
-                ),
-            with self.camera.canvas.after:
-                PopMatrix()
-
-        else:
-            print("Not all 4 corners have been set!")
-        
-        # Fields are the coordinates of the task
-        return fields
 
     setup_done = False
 
@@ -192,92 +157,43 @@ class CameraScreen(Screen):
         if platform == "android":
             from android.permissions import request_permissions, Permission
             request_permissions([Permission.CAMERA])#, Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
-        self.setup_done = True
-
+    
     def on_enter(self):
         print("CameraScreen.on_enter()")
 
         if not self.setup_done:
             self.setup_camera()
-            
+            self.setup_done = True
 
-        self.camera.play = True
+        cam = self.ids.a_cam
+        cam.play = True
 
     def on_leave(self):
         print("CameraScreen.on_leave()")
-   
+        cam = self.ids.a_cam
         if self.manager.current != 'cv2preprocessed_screen':
-            self.camera.play = False
+            cam.play = False
 
+    # def on_start(self):
+    #     print("CameraScreen.on_start()")
+    #     #Clock.schedule_once(self.setup_camera, 5)
 
+    # def get_frame(self, dt):
+    #     self.testOpencv()
+        
+    #     Clock.schedule_once(self.get_frame, 0.25)
 
-class CropWidget(Widget):
-    def __init__(self, **kwargs):
-        super(CropWidget, self).__init__(**kwargs)
-        self.size_hint = (None, None)
-        self.size = kwargs.get('size', Window.size)
-        # Define each dot with position, color, and label text.
-        self.dots = [
-            {"pos": [self.center_x - 50, self.center_y - 50], "color": (1, 0, 0, 1), "label": "A1"},  # Red
-            {"pos": [self.center_x + 50, self.center_y - 50], "color": (0, 1, 0, 1), "label": "H1"},  # Green
-            {"pos": [self.center_x + 50, self.center_y + 50], "color": (0, 0, 1, 1), "label": "H8"},  # Blue
-            {"pos": [self.center_x - 50, self.center_y + 50], "color": (1, 1, 0, 1), "label": "A8"}   # Yellow
-        ]
-        self.selected_dot = None
-        self.dot_radius = 20  # Drawn radius (dot will have a 40px diameter)
-        self.bind(pos=self.update_positions, size=self.update_positions)
-        self.update_positions()
+    def testOpencv(self):
+        cam = self.ids.a_cam
+        image_object = cam.export_as_image(scale=round((cam.camera_resolution[1] / int(cam.height)), 2))
+        w, h = image_object._texture.size
+        frame = np.frombuffer(image_object._texture.pixels, 'uint8').reshape(h, w, 4)
+        gray = cv2.cvtColor(frame, cv2.COLOR_RGBA2GRAY)
 
-    def update_positions(self, *args):
-        offset = 400  
-        offset = 400  
-        self.dots[0]["pos"] = [self.x + offset, self.y + offset]           # Bottom-left becomes 100px closer to center
-        self.dots[1]["pos"] = [self.right - offset, self.y + offset]         # Bottom-right
-        self.dots[2]["pos"] = [self.right - offset, self.top - offset]         # Top-right
-        self.dots[3]["pos"] = [self.x + offset, self.top - offset]           # Top-left
-        self.update_canvas()
-
-    def update_canvas(self):
-        self.canvas.clear()
-        for dot in self.dots:
-            with self.canvas:
-                # Draw the dot.
-                Color(*dot["color"])
-                x, y = dot["pos"]
-                Ellipse(pos=(x - self.dot_radius, y - self.dot_radius),
-                        size=(self.dot_radius * 2, self.dot_radius * 2))
-                # Create a CoreLabel for the dot's text.
-                core_label = CoreLabel(text=dot.get("label", ""),
-                                       font_size=100,
-                                       color=(1, 1, 1, 1))
-                core_label.refresh()
-                text_texture = core_label.texture
-                # Draw the text above the dot.
-                Rectangle(texture=text_texture,
-                          pos=(x - text_texture.width / 2, y + self.dot_radius + 5),
-                          size=text_texture.size)
-
-    def on_touch_down(self, touch):
-        if not self.collide_point(*touch.pos):
-            return False
-        # Define extra hit tolerance.
-        dot_hit_tolerance = 180
-        for i, dot in enumerate(self.dots):
-            x, y = dot["pos"]
-            if abs(touch.x - x) < self.dot_radius + dot_hit_tolerance and \
-               abs(touch.y - y) < self.dot_radius + dot_hit_tolerance:
-                self.selected_dot = i
-                return True
-        return super(CropWidget, self).on_touch_down(touch)
-
-    def on_touch_move(self, touch):
-        if self.selected_dot is not None and self.collide_point(*touch.pos):
-            self.dots[self.selected_dot]["pos"] = [touch.x, touch.y]
-            self.update_canvas()
-            return True
-        return super(CropWidget, self).on_touch_move(touch)
-
-    def on_touch_up(self, touch):
-        self.selected_dot = None
-        return super(CropWidget, self).on_touch_up(touch)
-
+        # Convert to kivy texture to display on the canvas
+        gray = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGBA) # Convert back to RGBA for displaying
+        texture = Texture.create(size=(gray.shape[1], gray.shape[0]))
+        texture.blit_buffer(gray.tobytes(), colorfmt='rgba', bufferfmt='ubyte')
+        self.ids.a_cam.canvas.before.clear()
+        with self.ids.a_cam.canvas:
+            Rectangle(texture=texture, size=self.ids.cv2_display.size, pos=self.ids.cv2_display.pos)

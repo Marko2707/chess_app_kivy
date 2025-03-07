@@ -5,33 +5,14 @@
     GridLayout:
         rows: 2
 
-        Button:
-            text: 'opencv'
-            size_hint: None, None
-            size: 300, 150
-            pos_hint: {'x': 0.5, 'y': 0.95}
-            on_release: 
-                #print("opencv")
-                root.manager.current = "cv2preprocessed_screen"
-                #root.testOpencv()
-
-        Button:
-            text: "Capture"
-            size_hint: None, None
-            size: 300, 150
-            pos_hint: {"center_x": 0.5, "y": 0.05}
-            on_press: root.capture(self)
-
         RelativeLayout:
-            size_hint: 1, 1
+            size_hint: 1, 0.8
 
             AndroidCamera:
                 index: 0
-                id: camera
-                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                id: a_cam
                 resolution: self.camera_resolution
-                allow_stretch: False
-                keep_ratio: True
+                allow_stretch: True
                 play: False
                 canvas.before:
                     PushMatrix
@@ -44,5 +25,12 @@
                         origin: self.center
                 canvas.after:
                     PopMatrix
-
-        
+        Button:
+            text: 'opencv'
+            size_hint: 1, None
+            height: root.height * 0.1
+            pos_hint: {'x': 0, 'y': 0}
+            on_release: 
+                print("opencv")
+                root.manager.current = "cv2preprocessed_screen"
+                #root.testOpencv()
