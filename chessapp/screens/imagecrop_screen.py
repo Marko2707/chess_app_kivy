@@ -90,7 +90,6 @@ class ImageCropScreen(Screen):
 
         # Add a button to save/get the dot positions
         save_button = Button(text='Save Positions', size_hint=(None, None), size=(450, 150),
-        save_button = Button(text='Save Positions', size_hint=(None, None), size=(450, 150),
                             pos_hint={'center_x': 0.5, 'y': 0.05})
         save_button.bind(on_press=self.save_positions)
         
