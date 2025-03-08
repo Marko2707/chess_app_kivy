@@ -4,7 +4,7 @@
 title = Kivy Reloader
 
 # (str) Package name
-package.name = kivy_reloader
+package.name = chessapp
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.example
@@ -177,6 +177,7 @@ android.skip_update = True
 # (list) List of Java files to add to the android project (can be java or a
 # directory containing the files)
 #android.add_src =
+android.add_src = chessapp/external/java
 
 # (list) Android AAR archives to add
 #android.add_aars =

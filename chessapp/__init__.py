@@ -35,7 +35,7 @@ class MainApp(App):
     def build(self):
         # # Create the screen manager
         self.screen_manager = screen_manager
-        
+
         self.screen_manager.add_widget(MainScreen(name='main_screen'))
         if platform == "android":
             self.screen_manager.add_widget(CameraScreen(name='camera_screen'))

@@ -34,7 +34,8 @@ class Cv2PreProcessedScreen(Screen):
         if self.manager.current != 'cv2preprocessed_screen':
             return
         cam = self.manager.get_screen('camera_screen').ids.a_cam
-        image_object = cam.export_as_image(scale=round((cam.camera_resolution[1] / int(cam.height)), 2))
+        #image_object = cam.export_as_image(scale=round((cam.camera_resolution[1] / int(cam.height)), 2))
+        image_object = cam.export_as_image()
         w, h = image_object._texture.size
         frame = np.frombuffer(image_object._texture.pixels, 'uint8').reshape(h, w, 4)
         gray = cv2.cvtColor(frame, cv2.COLOR_RGBA2GRAY)
@@ -53,7 +54,7 @@ class Cv2PreProcessedScreen(Screen):
                             minLineLength=200,  # Minimum line length
                             maxLineGap=50)      # Maximum gap between line segments
         if lines is not None:
-            black = gray#np.zeros_like(gray)
+            black = filtered#np.zeros_like(gray)
             # Convert to point format and calculate angles
             point_lines = []
             angles = []

@@ -15,6 +15,17 @@
                         id: cv2_texture
                         size: self.size
                         pos: self.pos
+                canvas.before:
+                    PushMatrix
+                    Rotate:
+                        angle: -90
+                        origin: self.center
+                    Scale:
+                        x: self.cam_ratio
+                        y: self.cam_ratio
+                        origin: self.center
+                canvas.after:
+                    PopMatrix
         Button:
             text: 'back'
             size_hint: 1, None
